@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Resource : MonoBehaviour
 {
+    public int PlaceIndex { get; set; }
     public event Action<Resource> Taken;
     public void Pickup()
     {

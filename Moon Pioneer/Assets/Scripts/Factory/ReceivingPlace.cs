@@ -16,13 +16,16 @@ public class ReceivingPlace : MonoBehaviour
     [SerializeField] int _resCount = 0;
 
     private Vector3 _resourceSize;
+
     private WaitForSeconds _produceTimeSeconds;
+
     //private List<Resource> _created = new List<Resource>(10);
-    private Resource[] _created;
+    private Resource[] _resourcesOnPlateau;
+    [SerializeField] private bool _isInProcess;
 
     private void Awake()
     {
-        _created = new Resource[_placeCapacity];
+        _resourcesOnPlateau = new Resource[_placeCapacity];
         _produceTimeSeconds = new WaitForSeconds(_produceTime);
         _resourceSize = _resourcePrefab.transform.localScale; //localScale lossyScale
     }
@@ -33,66 +36,74 @@ public class ReceivingPlace : MonoBehaviour
     }
 
     //private bool HasSpace => _created.Length < _placeCapacity;
-    private bool TryGetFreeSpaceIndex(out int resultIndex)
-    {
-        resultIndex = GetFirstEmptyPlaceIndex();
-        return resultIndex != -1;
-    }
-    
+
     private bool HasIngredients => true;
 
     private void ResourceTakenHandler(Resource taken)
     {
         //_created.Remove(taken);
-        for (int i = 0; i < _created.Length; i++)
+        //ReleaseTaken(taken);
+        int newFreeIndex = taken.PlaceIndex;
+        _resourcesOnPlateau[newFreeIndex] = null;
+        //fixme
+        if (_isInProcess == false)
         {
-            if (_created[i] == taken)
-            {
-                _created[i] = null;
-            }
+            StartCoroutine(TryCreateResource());
         }
-        StartCoroutine(TryCreateResource());
+        else
+        {
+            Debug.Log($"<color=cyan> уже в процессе  </color>");
+        }
 
         //если взяты сразу 2 реса, не запустится ли она сразу 2 раза?
     }
 
-    private IEnumerator TryCreateResource()
+    private void ReleaseTaken(Resource taken)
+    {
+        for (int i = 0; i < _resourcesOnPlateau.Length; i++)
+            if (_resourcesOnPlateau[i] == taken)
+                _resourcesOnPlateau[i] = null;
+    }
+
+    private IEnumerator TryCreateResource(/*int freeIndex*/)
     {
         while (HasIngredients && TryGetFreeSpaceIndex(out int index))
         {
-            if (index == 9)
-            {
-                int a = 3;
-            }
-                
-            int emptyPlaceIndex = GetFirstEmptyPlaceIndex();//или проще индексы хранить в newResource.Index; ? тогда неудобно именно ближайший, первый искать?
+            _isInProcess = true;
+
+            //или проще индексы хранить в newResource.Index; ? тогда неудобно именно ближайший, первый искать?
             Resource newResource = Instantiate(_resourcePrefab, transform);
             //_created.Add(newResource);
-            _created[emptyPlaceIndex] = newResource;
+            _resourcesOnPlateau[index] = newResource;
             //все ниже в newResource.Init
             var position = transform.position;
-            newResource.transform.position = new Vector3(position.x, position.y, index);
+            newResource.transform.position = new Vector3(position.x, 0, index);
             newResource.name = "Resource " + index;
             newResource.Taken += ResourceTakenHandler;
-            _resCount = _created.Length;
+            _resCount = _resourcesOnPlateau.Length;
             Debug.Log($"<color=cyan> создан рес {index} </color>");
             yield return _produceTimeSeconds;
         }
 
-        Debug.Log($"<color=yellow> stop CreateResource </color>");
+        _isInProcess = false;
+
+        Debug.Log($"<color=yellow> закончил CreateResource </color>");
     }
 
-    private int GetFirstEmptyPlaceIndex()
+    private bool TryGetFreeSpaceIndex(out int resultIndex)
     {
-        for (int i = 0; i < _created.Length; i++)
+        resultIndex = -1;
+        
+        for (int i = 0; i < _resourcesOnPlateau.Length; i++)
         {
-            if (_created[i] == null)
+            if (_resourcesOnPlateau[i] == null)
             {
-                return i;
+                resultIndex =  i;
+                return true;
             }
         }
-
-        return -1;//или возвращать int? => null
+        
+        return false;//или возвращать int? => null
     }
     
 }
