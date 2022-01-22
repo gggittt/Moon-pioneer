@@ -32,10 +32,11 @@
         </e>
         <e p="Scripts" t="Include">
           <e p="Carrier.cs" t="Include" />
+          <e p="Factory" t="Include">
+            <e p="ReceivingPlace.cs" t="Include" />
+          </e>
           <e p="Interactable" t="Include">
             <e p="IInteractable.cs" t="Include" />
-            <e p="ReceivingPlace.cs" t="Include" />
-            <e p="Resource.cs" t="Include" />
             <e p="SpendingPlace.cs" t="Include" />
           </e>
           <e p="Player" t="Include">
@@ -44,7 +45,10 @@
             <e p="Interacter.cs" t="Include" />
             <e p="PlayerInput.cs" t="Include" />
           </e>
-          <e p="ResourceType.cs" t="Include" />
+          <e p="Resource" t="Include">
+            <e p="Resource.cs" t="Include" />
+            <e p="ResourceType.cs" t="Include" />
+          </e>
         </e>
       </e>
       <e p="Library" t="Include">

@@ -25,7 +25,7 @@ public class PlayerInput : MonoBehaviour
             0,
             _joystick.Vertical
         );
-        
+
 #endif
 #if UNITY_EDITOR || UNITY_STANDALONE
         velocity = new Vector3(
@@ -33,10 +33,17 @@ public class PlayerInput : MonoBehaviour
             0,
             Input.GetAxis("Vertical")
         );
-#endif 
+#endif
 
-        _rigidbody.velocity = velocity * _moveSpeed;
-        
+        if (velocity != Vector3.zero)
+        {
+            _rigidbody.velocity = velocity * _moveSpeed;
+            
+            //transform.rotation = Quaternion.LookRotation(-velocity);
+        }
+        //todo скрипт бракейса или у др возьми
+
+
         /*
         if (velocity.x != 0)
             Debug.Log($"<color=cyan> velocity.x  </color>");
@@ -46,10 +53,5 @@ public class PlayerInput : MonoBehaviour
 
         //if (velocity.x != 0 && velocity.y != 0)
         //   _rigidbody.MovePosition(velocity * _moveSpeed);
-        
     }
-    
-
 }
-
-

@@ -1,19 +1,30 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Backpack))]
 public class Interacter : MonoBehaviour
 {
     public int Test = 1;
+
+    [SerializeField] private Backpack _backpack;
+    
     
     [SerializeField] private float _secondsToPrimaryInteract = 0.5f;// initial
     [SerializeField] private float _secondsToRepeatedInteract = 0.2f;//secondary
     private float _stayTime;
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.TryGetComponent(out Resource resource))
+        {
+            _backpack.TryPickResource(resource);
+        }
+    }
+
     private void OnTriggerStay(Collider other)
     {
-        var canInteract = other.TryGetComponent(out IInteractable interactable);
+        bool canInteract = other.TryGetComponent(out IInteractable interactable);
         if (canInteract == false) 
             return;
         
