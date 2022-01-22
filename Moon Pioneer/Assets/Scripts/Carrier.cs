@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Carrier : UnityEngine.MonoBehaviour
+public class Carrier : MonoBehaviour
 {
     
     

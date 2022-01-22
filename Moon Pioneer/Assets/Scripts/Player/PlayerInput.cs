@@ -6,7 +6,8 @@ using UnityEngine;
 public class PlayerInput : MonoBehaviour
 {
     [SerializeField] private Joystick _joystick;
-    
+    [SerializeField] private float _speed;
+
     
 
 }
