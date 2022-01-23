@@ -9,12 +9,12 @@ public class ReceivingPlace : MonoBehaviour
 
     [SerializeField] private float _produceTime = 0.7f;
 
-    [SerializeField] int _placeCapacity = 10;
+    [SerializeField] private int _placeCapacity = 10;
     
-    private WaitForSeconds _produceTimeSeconds;
-
-    private Resource[] _resourcesInStorage;
     [SerializeField] private bool _isInProcess;
+
+    private WaitForSeconds _produceTimeSeconds;
+    private Resource[] _resourcesInStorage;
 
     private void Awake()
     {

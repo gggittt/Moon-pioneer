@@ -16,8 +16,10 @@ public class SpendingPlace : MonoBehaviour, IInteractable
     public void TryInteract(Backpack backpack)
     {
         var typesAtBag = backpack.GetTypesInStock();
-        
-        if (typesAtBag.Contains(_requestedTypes))
+
+        bool hasRequestedType = typesAtBag.Contains(_requestedTypes);
+        Debug.Log($"<color=cyan> TryInteract с приемкой = {hasRequestedType}  </color>");
+        if (hasRequestedType)
         {
             TryTakeResource(backpack, _requestedTypes);
         }

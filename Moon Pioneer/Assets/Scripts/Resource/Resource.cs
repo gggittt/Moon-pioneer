@@ -7,7 +7,7 @@ public class Resource : MonoBehaviour
 {
     [SerializeField] private ResourceType _type;
     public ResourceType Type => _type;
-    [SerializeField] private float _lerpTime = .2f;
+    [SerializeField] private float _movLerpTime = .6f;
 
     public int PlaceIndex { get; private set; }
     public event Action<Resource> OnTake;
@@ -41,6 +41,7 @@ public class Resource : MonoBehaviour
 
     public void MoveTo(Vector3 localPositionInBag)
     {
+        Debug.Log($"<color=cyan> from world{transform.position} to local {localPositionInBag}  </color>");
         StartCoroutine(Move(localPositionInBag));
     }
 
@@ -49,7 +50,7 @@ public class Resource : MonoBehaviour
         const float tolerance = 0.05f;
         while (Vector3.Distance(localPositionInBag, transform.localPosition) > tolerance)
         {
-            Vector3 interpolatedPosition  = Vector3.Lerp(localPositionInBag, transform.localPosition, _lerpTime);
+            Vector3 interpolatedPosition  = Vector3.Lerp(localPositionInBag, transform.localPosition, _movLerpTime);
             
             transform.localPosition = interpolatedPosition ;
             yield return null;

@@ -14,7 +14,7 @@ public class BagVisual : MonoBehaviour
 
         
         
-        var localPositionInBag = GetPositionForResource(index, resourceTransform.localScale);
+        var localPositionInBag = GetLocalPositionForResource(index, resourceTransform.localScale);
         
         resource.MoveTo(localPositionInBag);
     }
