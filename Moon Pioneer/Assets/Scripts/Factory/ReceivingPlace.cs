@@ -13,7 +13,6 @@ public class ReceivingPlace : MonoBehaviour
 
     [SerializeField] private Vector2Int _gridSize = new Vector2Int(5, 4);
     [SerializeField] int _placeCapacity = 10;
-    [SerializeField] int _resCount = 0;
 
     private Vector3 _resourceSize;
 
@@ -39,13 +38,12 @@ public class ReceivingPlace : MonoBehaviour
 
     private bool HasIngredients => true;
 
-    private void ResourceTakenHandler(Resource taken)
+    private void ResourceOnTakeHandler(Resource taken)
     {
         //_created.Remove(taken);
         //ReleaseTaken(taken);
-        int newFreeIndex = taken.PlaceIndex;
+        int newFreeIndex = taken.PlaceIndex;//удали если не используешь индекс
         _resourcesOnPlateau[newFreeIndex] = null;
-        //fixme
         if (_isInProcess == false)
         {
             StartCoroutine(TryCreateResource());
@@ -55,7 +53,6 @@ public class ReceivingPlace : MonoBehaviour
             Debug.Log($"<color=cyan> уже в процессе  </color>");
         }
 
-        //если взяты сразу 2 реса, не запустится ли она сразу 2 раза?
     }
 
     private void ReleaseTaken(Resource taken)
@@ -71,17 +68,12 @@ public class ReceivingPlace : MonoBehaviour
         {
             _isInProcess = true;
 
-            //или проще индексы хранить в newResource.Index; ? тогда неудобно именно ближайший, первый искать?
+            //todo get from pool
             Resource newResource = Instantiate(_resourcePrefab, transform);
-            //_created.Add(newResource);
             _resourcesOnPlateau[index] = newResource;
-            //все ниже в newResource.Init
-            var position = transform.position;
-            newResource.transform.position = new Vector3(position.x, 0, index);
-            newResource.name = "Resource " + index;
-            newResource.Taken += ResourceTakenHandler;
-            _resCount = _resourcesOnPlateau.Length;
-            Debug.Log($"<color=cyan> создан рес {index} </color>");
+            newResource.Init(index);
+            newResource.OnTake += ResourceOnTakeHandler;
+            
             yield return _produceTimeSeconds;
         }
 

@@ -1,4 +1,4 @@
 ﻿public interface IInteractable
 {
-    void Interact(Interacter interacter);
+    void TryInteract(Backpack backpack);
 }

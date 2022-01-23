@@ -5,15 +5,14 @@ using UnityEngine;
 
 public class Interacter : MonoBehaviour
 {
-    public int Test = 1;
-
+    
     [SerializeField] private Backpack _backpack;
     
     
     [SerializeField] private float _secondsToPrimaryInteract = 0.5f;// initial
     [SerializeField] private float _secondsToRepeatedInteract = 0.2f;//secondary
     private float _stayTime;
-
+    
     private void OnTriggerEnter(Collider other)
     {
         if (other.TryGetComponent(out Resource resource))
@@ -33,9 +32,9 @@ public class Interacter : MonoBehaviour
 
         if (_stayTime >= _secondsToPrimaryInteract)
         {
-            interactable.Interact(this);
+            interactable.TryInteract(_backpack);
             _stayTime = 0;
-            Debug.Log($"<color=cyan>Test = {Test}  </color>");
+            Debug.Log($"<color=cyan>Test =   </color>");
         }
     }
     
@@ -44,7 +43,7 @@ public class Interacter : MonoBehaviour
         //если рядом не 1, а 2 Trigger - то баг
         _stayTime = 0;
     }
-
+    
 }
 
 

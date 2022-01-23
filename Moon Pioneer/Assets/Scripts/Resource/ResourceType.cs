@@ -1,7 +1,6 @@
-﻿namespace DefaultNamespace
+﻿public enum ResourceType
 {
-    public enum ResourceType
-    {
-        
-    }
+    Oil,
+    Plastic,
+    Metal,
 }

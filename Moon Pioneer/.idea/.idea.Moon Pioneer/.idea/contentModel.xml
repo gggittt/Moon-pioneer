@@ -41,6 +41,7 @@
           </e>
           <e p="Player" t="Include">
             <e p="Backpack.cs" t="Include" />
+            <e p="BagVisual.cs" t="Include" />
             <e p="Game description.txt" t="Include" />
             <e p="Interacter.cs" t="Include" />
             <e p="PlayerInput.cs" t="Include" />
