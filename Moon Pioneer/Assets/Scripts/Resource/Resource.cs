@@ -7,14 +7,10 @@ public class Resource : MonoBehaviour
 {
     [SerializeField] private ResourceType _type;
     public ResourceType Type => _type;
+    [SerializeField] private float _lerpTime = .2f;
 
-    public int PlaceIndex { get; set; }
+    public int PlaceIndex { get; private set; }
     public event Action<Resource> OnTake;
-    public void Pickup()
-    {
-        Debug.Log($"<color=cyan> {name} picked  </color>");
-        OnTake?.Invoke(this);
-    }
 
     public void Init(int index)
     {
@@ -23,6 +19,13 @@ public class Resource : MonoBehaviour
         cashTransform.position = new Vector3(cashTransform.position.x, 0, index);
         name = ToString();
         Debug.Log($"<color=green> created {name} </color>");
+    }
+
+    public void Pickup(int newIndex)
+    {
+        PlaceIndex = newIndex;
+        Debug.Log($"<color=cyan> {name} picked  </color>");
+        OnTake?.Invoke(this);
     }
 
     public override string ToString()
@@ -34,6 +37,23 @@ public class Resource : MonoBehaviour
     {
         Destroy(gameObject);
         //todo ToPoll();
+    }
+
+    public void MoveTo(Vector3 localPositionInBag)
+    {
+        StartCoroutine(Move(localPositionInBag));
+    }
+
+    private IEnumerator Move(Vector3 localPositionInBag)
+    {
+        const float tolerance = 0.05f;
+        while (Vector3.Distance(localPositionInBag, transform.localPosition) > tolerance)
+        {
+            Vector3 interpolatedPosition  = Vector3.Lerp(localPositionInBag, transform.localPosition, _lerpTime);
+            
+            transform.localPosition = interpolatedPosition ;
+            yield return null;
+        }
     }
 }
 

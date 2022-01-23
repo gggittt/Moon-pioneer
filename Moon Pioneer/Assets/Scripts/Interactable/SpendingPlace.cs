@@ -4,83 +4,48 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-[Serializable]
-public class ResourceRequest
-{
-    public ResourceType Type; //todo PascalCase?
-    public int Amount;
-    public bool IsComplete = false;
-}
+
 
 public class SpendingPlace : MonoBehaviour, IInteractable
 {
-    [SerializeField] private List<ResourceRequest> _typeAmountPair;
-    private HashSet<ResourceType> _requestedTypes;
+    //[SerializeField] private List<ResourceRequest> _typeAmountPair;
+    [SerializeField] private ResourceType _requestedTypes;
+    [SerializeField] private int _resourceCapacity = 20;
+    [SerializeField] private int _resourceAmount;
 
     public void TryInteract(Backpack backpack)
     {
-        var availableTypes = backpack.GetAvailableTypes();
-
-        Debug.Log($"<color=cyan> проверь совместимость Intersect HashSet/ List  </color>");
-        if (_requestedTypes.Intersect(availableTypes) is List<ResourceType> intersect)
+        var typesAtBag = backpack.GetTypesInStock();
+        
+        if (typesAtBag.Contains(_requestedTypes))
         {
-            TrySpend(backpack, intersect[0]);
+            TryTakeResource(backpack, _requestedTypes);
+        }
+    }
+    
+    private void TryTakeResource(Backpack backpack, ResourceType resourceType)
+    {
+        bool isFull = _resourceAmount < _resourceCapacity;
+        if (isFull == false)
+        {
+            TakeResource(backpack, resourceType);
         }
     }
 
-    private void Awake()
+    private void TakeResource(Backpack backpack, ResourceType resourceType)
     {
-        SetRequestedTypes();
-    }
-
-    private void TrySpend(Backpack backpack, ResourceType resourceType)
-    {
-        ResourceRequest resourceRequest = GetResourceRequestOfType(resourceType);
-        //мб убрать эту логику для общего случая, и оставить только частное? а то так грязи много с прогонкой туда-сюда _requestedTypes.Intersect
-        //могут быть баги если ГД добавит 2 одинаковых ResourceRequest ?
-
-        bool isComplete = resourceRequest.Amount > 0;
-        if (isComplete == false)
+        backpack.SpendResource(transform, resourceType);
+        _resourceAmount++;
+        if (_resourceAmount == _resourceCapacity)
         {
-            resourceRequest.Amount--;
-            if (resourceRequest.Amount == 0)
-            {
-                resourceRequest.IsComplete = true;
-                CheckCompleteCondition();
-            }
+            Complete();
         }
-
-        backpack.DeleteResource(resourceType);
     }
 
-    private void CheckCompleteCondition()
-    {
-        foreach (ResourceRequest point in _typeAmountPair)
-        {
-            if (point.IsComplete == false)
-                return;
-        }
-
-        Complete();
-    }
 
     private void Complete()
     {
         Debug.Log($"<color=cyan> цель здания {gameObject.name} готова  </color>");
     }
-
-    private ResourceRequest GetResourceRequestOfType(ResourceType resourceType)
-    {
-        return _typeAmountPair.FirstOrDefault(
-            item => item.Type == resourceType);
-    }
-
-    private void SetRequestedTypes()
-    {
-        _requestedTypes = new HashSet<ResourceType>();
-        foreach (ResourceRequest item in _typeAmountPair)
-        {
-            _requestedTypes.Add(item.Type);
-        }
-    }
+    
 }

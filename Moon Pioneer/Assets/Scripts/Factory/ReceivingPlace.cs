@@ -6,27 +6,20 @@ using UnityEngine;
 public class ReceivingPlace : MonoBehaviour
 {
     [SerializeField] private Resource _resourcePrefab;
-    [SerializeField] private Vector3 _resourceOffset;
 
     [SerializeField] private float _produceTime = 0.7f;
-    [SerializeField] private Transform _startSpawnPosition;
 
-    [SerializeField] private Vector2Int _gridSize = new Vector2Int(5, 4);
     [SerializeField] int _placeCapacity = 10;
-
-    private Vector3 _resourceSize;
-
+    
     private WaitForSeconds _produceTimeSeconds;
 
-    //private List<Resource> _created = new List<Resource>(10);
-    private Resource[] _resourcesOnPlateau;
+    private Resource[] _resourcesInStorage;
     [SerializeField] private bool _isInProcess;
 
     private void Awake()
     {
-        _resourcesOnPlateau = new Resource[_placeCapacity];
+        _resourcesInStorage = new Resource[_placeCapacity];
         _produceTimeSeconds = new WaitForSeconds(_produceTime);
-        _resourceSize = _resourcePrefab.transform.localScale; //localScale lossyScale
     }
 
     private void Start()
@@ -38,12 +31,17 @@ public class ReceivingPlace : MonoBehaviour
 
     private bool HasIngredients => true;
 
-    private void ResourceOnTakeHandler(Resource taken)
+    private void ResourceOnTakeHandler(Resource takenResource)
     {
-        //_created.Remove(taken);
-        //ReleaseTaken(taken);
-        int newFreeIndex = taken.PlaceIndex;//удали если не используешь индекс
-        _resourcesOnPlateau[newFreeIndex] = null;
+        
+        int newFreeIndex = takenResource.PlaceIndex; //удали если не используешь индекс //да, здесь в фабрике не используется
+        _resourcesInStorage[newFreeIndex] = null;
+
+        TryLaunchFactory();
+    }
+
+    private void TryLaunchFactory()
+    {
         if (_isInProcess == false)
         {
             StartCoroutine(TryCreateResource());
@@ -52,14 +50,13 @@ public class ReceivingPlace : MonoBehaviour
         {
             Debug.Log($"<color=cyan> уже в процессе  </color>");
         }
-
     }
 
     private void ReleaseTaken(Resource taken)
     {
-        for (int i = 0; i < _resourcesOnPlateau.Length; i++)
-            if (_resourcesOnPlateau[i] == taken)
-                _resourcesOnPlateau[i] = null;
+        for (int i = 0; i < _resourcesInStorage.Length; i++)
+            if (_resourcesInStorage[i] == taken)
+                _resourcesInStorage[i] = null;
     }
 
     private IEnumerator TryCreateResource(/*int freeIndex*/)
@@ -70,7 +67,7 @@ public class ReceivingPlace : MonoBehaviour
 
             //todo get from pool
             Resource newResource = Instantiate(_resourcePrefab, transform);
-            _resourcesOnPlateau[index] = newResource;
+            _resourcesInStorage[index] = newResource;
             newResource.Init(index);
             newResource.OnTake += ResourceOnTakeHandler;
             
@@ -86,16 +83,16 @@ public class ReceivingPlace : MonoBehaviour
     {
         resultIndex = -1;
         
-        for (int i = 0; i < _resourcesOnPlateau.Length; i++)
+        for (int i = 0; i < _resourcesInStorage.Length; i++)
         {
-            if (_resourcesOnPlateau[i] == null)
+            if (_resourcesInStorage[i] == null)
             {
                 resultIndex =  i;
                 return true;
             }
         }
         
-        return false;//или возвращать int? => null
+        return false;//или возвращать nullable "int?" => null
     }
     
 }

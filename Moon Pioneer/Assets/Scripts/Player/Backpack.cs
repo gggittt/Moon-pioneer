@@ -6,11 +6,10 @@ using UnityEngine;
 public class Backpack : MonoBehaviour
 {
     [SerializeField] private int _capacity = 10;
-    [SerializeField] private int _bagAmount = 0;
-    [SerializeField] private BagVisual _bag;
+    [SerializeField] private BagVisual _bagVisual;
     private List<Resource> _resources;
 
-    public HashSet<ResourceType> GetAvailableTypes()
+    public HashSet<ResourceType> GetTypesInStock()
     {
         var result = new HashSet<ResourceType>();
         
@@ -22,11 +21,26 @@ public class Backpack : MonoBehaviour
         return result;
     }
 
-    public void DeleteResource(ResourceType resourceType)
+    public void TryPickResource(Resource resource)
+    {
+        bool hasSpace = _resources.Count <= _capacity;
+        if (hasSpace)
+        {
+            PickResource(resource);
+        }
+    }
+
+    public void SpendResource(Transform targetPlace, ResourceType resourceType)
     {
         var item = GetResourceFromBug(resourceType);
+        _bagVisual.VisualizeRemoving(targetPlace, item);
         _resources.Remove(item);
         item.Delete();
+    }
+
+    private void Awake()
+    {
+        _resources = new List<Resource>(_capacity);
     }
 
     private Resource GetResourceFromBug(ResourceType resourceType)
@@ -41,28 +55,16 @@ public class Backpack : MonoBehaviour
         return null;
     }
 
-    public void TryPickResource(Resource resource)
-    {
-        bool hasSpace = _resources.Count <= _capacity;
-        if (hasSpace)
-        {
-            PickResource(resource);
-        }
-    }
-
-    private void Awake()
-    {
-        _resources = new List<Resource>(_capacity);
-    }
-
     private void PickResource(Resource resource)
     {
-        resource.Pickup();
-        //resource.transform.parent = transform;
-        resource.transform.SetParent(transform);
-        _bag.Visualize(resource);
         _resources.Add(resource);
-        _bagAmount = _resources.Count;//удали весь _bagAmount
+        int index = _resources.Count;
+        //int index = _resources.FindIndex(a => a == resource);
+        resource.Pickup(index);
+        //resource.transform.parent = transform;
+        
+        
+        _bagVisual.VisualizeAdd(resource, index);
     }
 
     
